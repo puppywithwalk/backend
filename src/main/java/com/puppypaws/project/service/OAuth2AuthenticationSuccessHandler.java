@@ -10,6 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -18,6 +20,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String accessToken = tokenProvider.generateAccessToken(authentication);
         tokenProvider.generateRefreshToken(authentication, accessToken);
+        response.setHeader(AUTHORIZATION, "bearer " + accessToken);
 
         String targetUrl =  UriComponentsBuilder.fromUriString(getDefaultTargetUrl())
                 .queryParam("accessToken", accessToken)

@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +39,7 @@ public class TokenProvider {
 
     public void generateRefreshToken(Authentication authentication, String accessToken) {
         String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);
+//        tokenRepository.saveToken(new Token(accessToken, refreshToken));
         tokenRepository.saveToken(accessToken, refreshToken);
     }
     public String generateAccessToken(Authentication authentication){
@@ -59,13 +61,18 @@ public class TokenProvider {
     }
     public String reissueAccessToken(String accessToken) {
         if (StringUtils.hasText(accessToken)) {
-            Token token = tokenRepository.findByAccessToken(accessToken);
-            String refreshToken = token.getRefreshToken();
+            Optional<Token> tokenOptional = tokenRepository.findByAccessToken(accessToken);
+            if (tokenOptional.isPresent()) {
+                Token token = tokenOptional.get();
+                String refreshToken = token.getRefreshToken();
 
-            if (validationToken(refreshToken)) {
-                String reissueAccessToken = generateToken(getAuthentication(refreshToken), ACCESS_TOKEN_EXPIRE_TIME);
-                tokenRepository.updateToken(reissueAccessToken, refreshToken);
-                return reissueAccessToken;
+                if (validationToken(refreshToken)) {
+                    String reissueAccessToken = generateToken(getAuthentication(refreshToken), ACCESS_TOKEN_EXPIRE_TIME);
+//                    tokenRepository.delete(new Token(accessToken, refreshToken));
+//                    tokenRepository.save(new Token(reissueAccessToken, refreshToken));
+                    tokenRepository.updateToken(reissueAccessToken, refreshToken);
+                    return reissueAccessToken;
+                }
             }
         }
         return null;
@@ -92,6 +99,12 @@ public class TokenProvider {
                         .toList();
 
         return new UsernamePasswordAuthenticationToken(claims.get("name"),"",authorities);
+    }
+    public String resolveToken(String bearerToken){
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")){
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
     public String resolveToken(HttpServletRequest request){

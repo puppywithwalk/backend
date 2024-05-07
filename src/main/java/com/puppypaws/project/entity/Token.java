@@ -19,4 +19,13 @@ public class Token {
 
     @Column(name = "refresh_token", length = 2048)
     private String refreshToken;
+
+    public Token(String accessToken, String refreshToken){
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
+
+    public Token() {
+
+    }
 }

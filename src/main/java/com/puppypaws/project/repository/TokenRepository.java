@@ -1,6 +1,5 @@
 package com.puppypaws.project.repository;
 
-
 import com.puppypaws.project.entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,9 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
-    Token  findByAccessToken(String accessToken);
+    Optional<Token> findByAccessToken(String accessToken);
 
     @Modifying
     @Transactional
@@ -18,9 +19,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     void updateToken(String newAccessToken, String refreshToken);
 
     default void saveToken(String accessToken, String refreshToken) {
-        Token token = new Token();
-        token.setAccessToken(accessToken);
-        token.setRefreshToken(refreshToken);
-        save(token);
+        save(new Token(accessToken, refreshToken));
     }
 }

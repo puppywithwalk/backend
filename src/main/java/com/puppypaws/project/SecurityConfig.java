@@ -1,15 +1,14 @@
 package com.puppypaws.project;
 
+import com.puppypaws.project.exception.TokenException;
 import com.puppypaws.project.service.CustomOAuth2UserService;
 import com.puppypaws.project.service.JwtAuthFilter;
 import com.puppypaws.project.service.OAuth2AuthenticationSuccessHandler;
 
 import com.puppypaws.project.service.Oauth2FailureHandler;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,21 +21,18 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Collections;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
-    @Autowired
-    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    @Autowired
-    private Oauth2FailureHandler oauth2FailureHandler;
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final Oauth2FailureHandler oauth2FailureHandler;
+    private final JwtAuthFilter jwtAuthFilter;
+    private final TokenException tokenException;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authRequest -> authRequest
-                .requestMatchers("/login/oauth2/code/kakao").permitAll() // "/test" 엔드포인트에 대한 요청만 허용
-                .requestMatchers("/login/oauth2/code/google").permitAll() // "/test" 엔드포인트에 대한 요청만 허용
+                .requestMatchers("/token/refresh").permitAll()
                 .requestMatchers("/test").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/community").permitAll()
@@ -53,7 +49,8 @@ public class SecurityConfig {
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
                 .addFilterBefore(jwtAuthFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenException, JwtAuthFilter.class);
 
         return http.build();
     }
