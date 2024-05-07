@@ -22,7 +22,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         tokenProvider.generateRefreshToken(authentication, accessToken);
         response.setHeader(AUTHORIZATION, "bearer " + accessToken);
 
-        String targetUrl =  UriComponentsBuilder.fromUriString(getDefaultTargetUrl())
+        String targetUrl =  UriComponentsBuilder.fromUriString("/signin/auth")
                 .queryParam("accessToken", accessToken)
                 .build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
