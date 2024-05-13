@@ -20,12 +20,12 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-
+    private static final String REFRESH_TOKEN_URI = "/token/refresh";
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = tokenProvider.resolveToken(request);
 
-        if (!StringUtils.hasText(token)){
+        if (shouldSkipFilter(request, token)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -34,14 +34,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throw new JwtException("토큰 만료");
         }
 
-        if (StringUtils.hasText(token) && tokenProvider.validationToken(token)){
-            setAuthentication(token);
-        }
+        setAuthentication(token);
         filterChain.doFilter(request, response);
     }
 
     private void setAuthentication(String token){
         Authentication authentication = tokenProvider.getAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private boolean shouldSkipFilter(HttpServletRequest request, String token) {
+        return !StringUtils.hasText(token) || isRefreshTokenRequest(request);
+    }
+
+    private boolean isRefreshTokenRequest(HttpServletRequest request) {
+        return request.getRequestURI().contains(REFRESH_TOKEN_URI);
     }
 }
