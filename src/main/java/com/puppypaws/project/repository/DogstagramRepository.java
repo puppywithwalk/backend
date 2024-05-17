@@ -1,5 +1,6 @@
 package com.puppypaws.project.repository;
 
+import com.puppypaws.project.dto.DogstagramResponseDto;
 import com.puppypaws.project.entity.Dogstagram;
 import com.puppypaws.project.model.IDogstagram;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,4 +67,43 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
                     "ORDER BY total_like DESC, created_at DESC " +
                     "LIMIT 4 ", nativeQuery = true)
     public List<IDogstagram> getStarDogstagramList(@Param(value = "id") Long id);
+    
+    @Query(value =
+    "SELECT" +
+            "    dogstagram.id AS id," +
+            "    dogstagram.description AS description," +
+            "    attachment.url AS url," +
+            "    attachment.url2 AS url2," +
+            "    attachment.url3 AS url3," +
+            "    member.nickname AS nickname," +
+            "    member.id AS user_id," +
+            "    member.profile_url AS profile_url," +
+            "    (SELECT nickname" +
+            "     FROM member" +
+            "     WHERE id = (SELECT user_id" +
+            "                 FROM dogstagram_like" +
+            "                 WHERE dogstagram_id = dogstagram.id" +
+            "                 ORDER BY created_at DESC" +
+            "                 LIMIT 1)) AS last_liked_nickname," +
+            "    dogstagram.created_at AS created_at," +
+            "    (SELECT COUNT(*)" +
+            "     FROM dogstagram_like m" +
+            "     WHERE m.dogstagram_id = dogstagram.id) AS total_like," +
+            "    EXISTS(SELECT 1" +
+            "           FROM dogstagram_like" +
+            "           WHERE dogstagram_id = dogstagram.id AND user_id = :user_id) AS is_liked " +
+            "FROM" +
+            "    dogstagram" +
+            "        INNER JOIN member ON member.id = dogstagram.member_id" +
+            "        INNER JOIN attachment ON dogstagram.id = attachment.dogstagram_id" +
+            " WHERE member.dog_name ILIKE '%' || :search_word || '%' " +
+            "ORDER BY" +
+            "    dogstagram.created_at DESC " +
+            "LIMIT :take " +
+            "OFFSET :skip", nativeQuery = true)
+    public List<IDogstagram> searchDogstagramBy(
+            @Param(value = "user_id") Long userId,
+            @Param(value = "search_word") String searchWord,
+            @Param(value = "take") int take,
+            @Param(value = "skip") int skip);
 }

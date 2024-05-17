@@ -47,4 +47,11 @@ public class DogstagramService {
 
         return dto;
     }
+    public List<DogstagramResponseDto> searchDogstagrams(Long userId, String searchWord, int take, int skip) {
+        List<IDogstagram> dogstagrams = dogstagramRepository.searchDogstagramBy(userId, searchWord, take, skip);
+        return dogstagrams.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
 }
