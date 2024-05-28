@@ -9,8 +9,8 @@ public class SecurityUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
-            if (principal instanceof String) {
-                return Long.valueOf((String) principal);
+            if (principal instanceof Integer) {
+                return ((Integer) principal).longValue();
             }
         }
         return null;
