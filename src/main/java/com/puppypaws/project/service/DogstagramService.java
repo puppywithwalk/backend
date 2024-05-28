@@ -3,6 +3,7 @@ package com.puppypaws.project.service;
 import com.puppypaws.project.dto.DogstagramResponseDto;
 import com.puppypaws.project.model.IDogstagram;
 import com.puppypaws.project.repository.DogstagramRepository;
+import com.puppypaws.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -48,11 +49,9 @@ public class DogstagramService {
         return dto;
     }
     public List<DogstagramResponseDto> searchDogstagrams(String searchWord, int take, int skip) {
-        Long id = null;
-        List<IDogstagram> dogstagrams = dogstagramRepository.searchDogstagramBy(id, searchWord, take, skip);
+        List<IDogstagram> dogstagrams = dogstagramRepository.searchDogstagramBy(SecurityUtil.getAuthenticatedUserId(), searchWord, take, skip);
         return dogstagrams.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
-
 }

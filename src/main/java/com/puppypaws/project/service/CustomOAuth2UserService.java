@@ -1,6 +1,7 @@
 package com.puppypaws.project.service;
 
 import com.puppypaws.project.entity.Member;
+import com.puppypaws.project.model.CustomOAuth2User;
 import com.puppypaws.project.model.GoogleUser;
 import com.puppypaws.project.model.KaKaoUser;
 import com.puppypaws.project.model.ProviderUser;
@@ -27,13 +28,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final MemberRepository memberRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        ClientRegistration clientRegistration = userRequest.getClientRegistration();
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
-        ProviderUser providerUser = providerUser(clientRegistration, oAuth2User);
-        register(providerUser);
 
-        return oAuth2User;
+        ClientRegistration clientRegistration = userRequest.getClientRegistration();
+        ProviderUser providerUser = providerUser(clientRegistration, oAuth2User);
+        String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+
+        Long id = register(providerUser);
+
+        return new CustomOAuth2User(oAuth2User.getAuthorities(), oAuth2User.getAttributes(), userNameAttributeName, id);
     }
 
     private ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User){
@@ -43,18 +47,23 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         } else if(registrationId.equals("kakao")){
             return new KaKaoUser(oAuth2User, clientRegistration);
         }
-        return null;
+        throw new RuntimeException("ILLEGAL_REGISTRATION_ID");
     }
 
-    private void register(ProviderUser providerUser){
-        Optional<Member> findUser = memberRepository.findByEmail(providerUser.getEmail());
-        if(findUser.isEmpty()){
-            String provider = providerUser.getProvider().equals("google") ? "G" : "K";
-            Member member = new Member();
-            member.setNickname(providerUser.getUsername());
-            member.setEmail(providerUser.getEmail());
-            member.setProvider(provider);
-            memberRepository.save(member);
-         }
+    private Long register(ProviderUser providerUser) {
+        String provider = providerUser.getProvider().equals("google") ? "G" : "K";
+        Optional<Member> findUser = memberRepository.findByEmailAndProvider(providerUser.getEmail(), provider);
+
+        if (findUser.isEmpty()) {
+            Member member = Member.builder()
+                    .nickname(providerUser.getUsername())
+                    .email(providerUser.getEmail())
+                    .provider(provider)
+                    .build();
+
+            return memberRepository.save(member).getId();
+        } else {
+            return findUser.get().getId();
+        }
     }
 }
