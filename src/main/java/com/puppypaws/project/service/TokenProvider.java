@@ -1,6 +1,7 @@
 package com.puppypaws.project.service;
 
 import com.puppypaws.project.entity.Token;
+import com.puppypaws.project.model.CustomOAuth2User;
 import com.puppypaws.project.repository.TokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProvider {
     private final Key key;
-    private final static long ACCESS_TOKEN_EXPIRE_TIME  = 1000L * 60L * 3L;
+    private final static long ACCESS_TOKEN_EXPIRE_TIME  = 1000L * 60L * 1L;
     private final static long REFRESH_TOKEN_EXPIRE_TIME  = 1000L * 60L * 60L * 8L;
     @Autowired
     private TokenRepository tokenRepository;
@@ -51,9 +52,12 @@ public class TokenProvider {
         String authorties = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
+
+        Object principal = authentication.getPrincipal();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         return Jwts.builder()
                         .claim("auth", authorties)
-                        .claim("name", authentication.getName())
+                        .claim("id", customOAuth2User.getId())
                         .setIssuedAt(now)
                         .setExpiration(expiredDate)
                         .signWith(key)
@@ -85,9 +89,9 @@ public class TokenProvider {
             return e.getClaims();
         }
     }
-    public Authentication getAuthentication(String accesToken){
+    public Authentication getAuthentication(String accessToken){
 
-        Claims claims = parseClaims(accesToken);
+        Claims claims = parseClaims(accessToken);
 
         if(claims.get("auth") == null){
             throw new RuntimeException("ERR");
@@ -98,7 +102,7 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 
-        return new UsernamePasswordAuthenticationToken(claims.get("name"),"",authorities);
+        return new UsernamePasswordAuthenticationToken(claims.get("id"),"",authorities);
     }
     public String resolveToken(String bearerToken){
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")){
