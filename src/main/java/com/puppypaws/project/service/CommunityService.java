@@ -54,4 +54,10 @@ public class CommunityService {
         });
         return modelMapper.map(community, CommunityResponseDto.class);
     }
+
+    public List<CommunityResponseDto> getCommunitiesByConditions(int pageNo, int pageSize, String pickupLocation, String status, String dogType) {
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
+        Page<Community> result = communityRepository.findCommunitiesByConditions(pickupLocation, status, dogType, pageRequest);
+        return result.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
+    }
 }

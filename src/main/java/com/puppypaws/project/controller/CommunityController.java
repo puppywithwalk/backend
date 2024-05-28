@@ -35,4 +35,14 @@ public class CommunityController {
     ) {
         return communityService.getOne(id);
     }
+
+    @GetMapping("/community/search")
+    public List<CommunityResponseDto> searchCommunityList(
+            @RequestParam String pickupLocation,
+            @RequestParam String status,
+            @RequestParam String dogType,
+            @RequestParam(name = "skip", defaultValue = "0") int pageNo,
+            @RequestParam(name = "take", defaultValue = "10") int pageSize) {
+        return communityService.getCommunitiesByConditions(pageNo, pageSize, pickupLocation, status, dogType);
+    }
 }

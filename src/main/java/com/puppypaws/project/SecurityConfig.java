@@ -14,11 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -37,9 +33,11 @@ public class SecurityConfig {
                 .requestMatchers("/test").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/community").permitAll()
+                .requestMatchers("/community/search").permitAll()
                 .requestMatchers("/community/{id}").permitAll()
                 .requestMatchers("/dogstagram").permitAll()
                 .requestMatchers("/dogstagram/star-dogs").permitAll()
+                .requestMatchers("/dogstagram/search").permitAll()
                 .anyRequest().authenticated())
 
         .sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
