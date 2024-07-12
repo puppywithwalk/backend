@@ -1,31 +1,15 @@
 package com.puppypaws.project.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.ibatis.annotations.Update;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.TimeZoneColumn;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.security.Timestamp;
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @Data
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "Member")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Member {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Member extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_id_generator")
@@ -57,14 +41,9 @@ public class Member {
     @Column(name = "dog_profile_url")
     private String dogProfileUrl;
 
-    @Column(name = "created_at", updatable = false)
-    @TimeZoneColumn
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @TimeZoneColumn
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
+    public Member(String nickname, String email, String provider) {
+        this.nickname = nickname;
+        this.email = email;
+        this.provider = provider;
+    }
 }

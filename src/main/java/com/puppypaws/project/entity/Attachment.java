@@ -2,18 +2,11 @@ package com.puppypaws.project.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.TimeZoneColumn;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Data
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "Attachment")
-public class Attachment {
+public class Attachment extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_id_generator")
@@ -32,15 +25,5 @@ public class Attachment {
 
     @Column(name = "url3")
     private String url3;
-
-    @Column(name = "created_at", updatable = false)
-    @TimeZoneColumn
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @TimeZoneColumn
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }
 

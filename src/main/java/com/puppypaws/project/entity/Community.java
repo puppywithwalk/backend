@@ -3,19 +3,15 @@ package com.puppypaws.project.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.TimeZoneColumn;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Data
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "Community")
-public class Community {
+public class Community extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "community_id_generator")
     @SequenceGenerator(name="community_id_generator", sequenceName="community_id", allocationSize = 1)
@@ -35,17 +31,7 @@ public class Community {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "created_at", updatable = false)
-    @TimeZoneColumn
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @TimeZoneColumn
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member member;
 }

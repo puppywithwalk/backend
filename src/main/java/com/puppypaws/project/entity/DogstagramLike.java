@@ -20,7 +20,7 @@ public class DogstagramLike {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dogstagram_id")
     private Dogstagram dogstagram;
 

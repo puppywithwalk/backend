@@ -55,11 +55,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Optional<Member> findUser = memberRepository.findByEmailAndProvider(providerUser.getEmail(), provider);
 
         if (findUser.isEmpty()) {
-            Member member = Member.builder()
-                    .nickname(providerUser.getUsername())
-                    .email(providerUser.getEmail())
-                    .provider(provider)
-                    .build();
+            Member member = new Member(
+                    providerUser.getUsername(),
+                    providerUser.getEmail(),
+                    provider
+            );
 
             return memberRepository.save(member).getId();
         } else {
