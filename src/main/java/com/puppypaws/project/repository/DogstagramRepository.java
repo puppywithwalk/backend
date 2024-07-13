@@ -1,6 +1,5 @@
 package com.puppypaws.project.repository;
 
-import com.puppypaws.project.dto.DogstagramResponseDto;
 import com.puppypaws.project.entity.Dogstagram;
 import com.puppypaws.project.model.IDogstagram;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,9 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
+
+    List<Dogstagram> findByMember_Id(Long user_id);
+    Optional<Dogstagram> findById(Long id);
 
     @Query(value =
             "SELECT dogstagram.id AS id," +
@@ -21,6 +24,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "attachment.url3 AS url3," +
             "member.nickname AS nickname," +
             "member.id AS user_id," +
+            "member.dog_type AS dog_type," +
             "member.profile_url AS profile_url," +
             "dogstagram_like.nickname AS last_liked_nickname," +
             "dogstagram.created_at AS created_at," +
@@ -49,6 +53,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
                     "attachment.url3 AS url3," +
                     "member.nickname AS nickname," +
                     "member.id AS user_id," +
+                    "member.dog_type AS dog_type," +
                     "member.profile_url AS profile_url," +
                     "dogstagram_like.nickname AS last_liked_nickname," +
                     "dogstagram.created_at AS created_at," +
@@ -78,6 +83,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "    member.nickname AS nickname," +
             "    member.id AS user_id," +
             "    member.profile_url AS profile_url," +
+            "    member.dog_type AS dog_type," +
             "    (SELECT nickname" +
             "     FROM member" +
             "     WHERE id = (SELECT user_id" +

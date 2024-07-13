@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "Token")
 public class Token {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "token_id_generator")
     @SequenceGenerator(name="token_id_generator", sequenceName="token_id", allocationSize = 1)

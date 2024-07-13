@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,7 +21,9 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
             "AND (:status IS NULL OR c.status ILIKE CONCAT('%', :status, '%')) " +
             "AND (m.dogType IS NULL OR m.dogType ILIKE CONCAT('%', :dogType, '%'))")
     Page<Community> findCommunitiesByConditions(@Param("pickupLocation") String pickupLocation,
-                                                @Param("status") String status,
-                                                @Param("dogType") String dogType,
-                                                Pageable pageable);
+            @Param("status") String status,
+            @Param("dogType") String dogType,
+            Pageable pageable);
+
+    List<Community> findByMember_Id(long user_id);
 }

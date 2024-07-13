@@ -1,6 +1,5 @@
-package com.puppypaws.project.dto;
+package com.puppypaws.project.dto.Token;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

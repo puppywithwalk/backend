@@ -1,12 +1,12 @@
 package com.puppypaws.project.controller;
 
-import com.puppypaws.project.dto.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.PostCommunityRequestDto;
 import com.puppypaws.project.service.CommunityService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,5 +44,34 @@ public class CommunityController {
             @RequestParam(name = "skip", defaultValue = "0") int pageNo,
             @RequestParam(name = "take", defaultValue = "10") int pageSize) {
         return communityService.getCommunitiesByConditions(pageNo, pageSize, pickupLocation, status, dogType);
+    }
+
+    @PostMapping("/community")
+    public ResponseEntity<String> postCommunity(
+            @RequestBody() PostCommunityRequestDto postCommunityRequestDto
+    ) {
+        return communityService.postCommunity(postCommunityRequestDto);
+    }
+
+    @DeleteMapping("/community/{id}")
+    public ResponseEntity<String> deleteCommunity(
+            @PathVariable(value = "id") Long id
+    ) throws BadRequestException {
+        return communityService.deleteCommunity(id);
+    }
+
+    @PatchMapping("/community/{id}")
+    public ResponseEntity<String> patchCommunity(
+            @PathVariable(value = "id") Long id,
+            @RequestBody(required = false) PostCommunityRequestDto postCommunityRequestDto
+    ) throws BadRequestException {
+        return communityService.patchCommunity(id, postCommunityRequestDto);
+    }
+
+    @PatchMapping("/community/status/{id}")
+    public ResponseEntity<String> patchStatus (
+            @PathVariable(value = "id") Long id
+    ) throws BadRequestException {
+        return communityService.patchStatus(id);
     }
 }

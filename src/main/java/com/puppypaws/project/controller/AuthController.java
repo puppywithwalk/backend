@@ -1,6 +1,6 @@
 package com.puppypaws.project.controller;
 
-import com.puppypaws.project.dto.TokenResponseDto;
+import com.puppypaws.project.dto.Token.TokenResponseDto;
 import com.puppypaws.project.entity.Token;
 import com.puppypaws.project.repository.TokenRepository;
 import com.puppypaws.project.service.TokenProvider;
@@ -15,6 +15,11 @@ import java.util.Optional;
 public class AuthController {
     private final TokenProvider tokenProvider;
     private final TokenRepository tokenRepository;
+
+    @GetMapping("/signin/getToken")
+    public String test(){
+        return "ok";
+    }
 
     @GetMapping("/token/refresh")
     @ResponseBody

@@ -1,7 +1,7 @@
 package com.puppypaws.project.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.puppypaws.project.dto.TokenResponseDto;
+import com.puppypaws.project.dto.Token.TokenResponseDto;
 import io.jsonwebtoken.JwtException;
 
 import jakarta.servlet.FilterChain;

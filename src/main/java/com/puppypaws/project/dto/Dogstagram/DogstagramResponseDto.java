@@ -1,4 +1,4 @@
-package com.puppypaws.project.dto;
+package com.puppypaws.project.dto.Dogstagram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -17,13 +17,16 @@ public class DogstagramResponseDto {
     private Long id;
 
     @JsonProperty("user_id")
-    private Long userId;
+    private Long user_id;
 
     @JsonProperty("nickname")
     private String nickname;
 
     @JsonProperty("profile_url")
-    private String profileUrl;
+    private String profile_url;
+
+    @JsonProperty("dog_type")
+    private String dog_type;
 
     @JsonProperty("description")
     private String description;
@@ -32,14 +35,14 @@ public class DogstagramResponseDto {
     private String[] imageUrls;
 
     @JsonProperty("is_liked")
-    private Boolean isLiked;
+    private Boolean is_liked;
 
     @JsonProperty("total_like")
-    private Integer totalLike;
+    private Integer total_like;
 
     @JsonProperty("last_liked_nickname")
-    private String lastLikedNickname;
+    private String last_liked_nickname;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private Date created_at;
 }

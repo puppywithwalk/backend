@@ -24,7 +24,7 @@ public class Community extends BaseTimeEntity{
     @Column(name = "pickup_date", nullable = false)
     private Date pickupDate;
 
-    @Column(name = "status", nullable = false, length = 1)
+    @Column(name = "status", length = 1)
     @ColumnDefault("'N'")
     private String status;
 

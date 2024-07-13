@@ -38,6 +38,9 @@ public class Member extends BaseTimeEntity{
     @Column(name = "dog_character")
     private String dogCharacter;
 
+    @Column(name = "dog_character2")
+    private String dogCharacter2;
+
     @Column(name = "dog_profile_url")
     private String dogProfileUrl;
 

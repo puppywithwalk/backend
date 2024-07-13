@@ -1,4 +1,4 @@
-package com.puppypaws.project.dto;
+package com.puppypaws.project.dto.Community;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Setter;
