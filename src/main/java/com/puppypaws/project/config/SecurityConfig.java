@@ -1,4 +1,4 @@
-package com.puppypaws.project;
+package com.puppypaws.project.config;
 
 import com.puppypaws.project.exception.TokenException;
 import com.puppypaws.project.service.CustomOAuth2UserService;

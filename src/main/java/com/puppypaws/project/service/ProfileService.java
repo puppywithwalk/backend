@@ -25,8 +25,7 @@ public class ProfileService {
     private final MemberRepository memberRepository;
     private final DogstagramRepository dogstagramRepository;
     private final CommunityRepository communityRepository;
-
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     public ResponseEntity<ProfileResponseDto> getProfile(Long user_id){
         Optional<Member> member = memberRepository.findById(user_id);

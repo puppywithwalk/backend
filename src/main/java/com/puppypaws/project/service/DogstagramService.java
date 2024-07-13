@@ -32,9 +32,8 @@ public class DogstagramService {
     private final DogstagramRepository dogstagramRepository;
     private final AttachmentRepository attachmentRepository;
     private final AwsS3UploadService awsS3UploadService;
+    private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(DogstagramService.class);
-
-    private ModelMapper modelMapper = new ModelMapper();
 
     public List<DogstagramResponseDto> getList(int take, int skip) {
         Long id = null;
