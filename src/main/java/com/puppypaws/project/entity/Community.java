@@ -1,15 +1,15 @@
 package com.puppypaws.project.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
 @Entity
 @Data
-@EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Community")
 public class Community extends BaseTimeEntity{
     @Id
@@ -34,4 +34,12 @@ public class Community extends BaseTimeEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member member;
+
+    public Community(Member member, String description, Date pickupDate, String pickupLocation, String status) {
+        this.member = member;
+        this.description = description;
+        this.pickupDate = pickupDate;
+        this.pickupLocation = pickupLocation;
+        this.status = status;
+    }
 }

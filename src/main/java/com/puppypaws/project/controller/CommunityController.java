@@ -54,24 +54,17 @@ public class CommunityController {
     }
 
     @DeleteMapping("/community/{id}")
-    public ResponseEntity<String> deleteCommunity(
-            @PathVariable(value = "id") Long id
-    ) throws BadRequestException {
+    public ResponseEntity<String> deleteCommunity(@PathVariable(value = "id") Long id) {
         return communityService.deleteCommunity(id);
     }
 
     @PatchMapping("/community/{id}")
-    public ResponseEntity<String> patchCommunity(
-            @PathVariable(value = "id") Long id,
-            @RequestBody(required = false) PostCommunityRequestDto postCommunityRequestDto
-    ) throws BadRequestException {
+    public ResponseEntity<String> patchCommunity(@PathVariable(value = "id") Long id, @RequestBody(required = false) PostCommunityRequestDto postCommunityRequestDto) {
         return communityService.patchCommunity(id, postCommunityRequestDto);
     }
 
     @PatchMapping("/community/status/{id}")
-    public ResponseEntity<String> patchStatus (
-            @PathVariable(value = "id") Long id
-    ) throws BadRequestException {
+    public ResponseEntity<String> patchStatus (@PathVariable(value = "id") Long id) {
         return communityService.patchStatus(id);
     }
 }
