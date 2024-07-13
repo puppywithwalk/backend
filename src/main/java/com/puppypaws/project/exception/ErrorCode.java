@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum ErrorCode {
     NO_USER(401, "사용자 계정을 확인해주세요."),
     EXPIRED_TOKEN(401, "액세스토큰이 만료되었습니다."),
-    NO_COMMUNITY(404, "Community ID를 확인해주세요."),
+    NOT_FOUND(404, "ID를 확인해주세요."),
     NOT_AUTHOR(403, "작성자가 아닙니다.");
 
     private final int statusCode;

@@ -1,11 +1,9 @@
 package com.puppypaws.project.controller;
 
 import com.puppypaws.project.dto.Dogstagram.DogstagramPatchRequestDto;
-import com.puppypaws.project.dto.Dogstagram.DogstagramRequestDto;
 import com.puppypaws.project.dto.Dogstagram.DogstagramResponseDto;
 import com.puppypaws.project.entity.Dogstagram;
 import com.puppypaws.project.service.DogstagramService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +66,7 @@ public class DogstagramController {
     public ResponseEntity<String> patchDogstagram (
             @PathVariable(value = "id") Long id,
             @RequestBody() DogstagramPatchRequestDto dto
-    ) throws IOException {
+    ) {
         return dogstagramService.patchDogstagram(
                 id,
                 dto.getDescription()
@@ -78,7 +76,7 @@ public class DogstagramController {
     @DeleteMapping("/dogstagram/{id}")
     public ResponseEntity<String> deleteDogstagram (
             @PathVariable(value = "id") Long id
-    ) throws BadRequestException {
+    ) {
         return dogstagramService.deleteDogstagram(id);
     }
 

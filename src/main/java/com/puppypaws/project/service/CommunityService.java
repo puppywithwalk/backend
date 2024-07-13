@@ -120,7 +120,7 @@ public class CommunityService {
         Optional<Community> community = communityRepository.findById(id);
 
         if (community.isEmpty()) {
-           throw new CustomException(ErrorCode.NO_COMMUNITY);
+           throw new CustomException(ErrorCode.NOT_FOUND);
         }
 
         Community communityEntity = community.get();

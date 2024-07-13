@@ -24,7 +24,7 @@ public class Dogstagram extends BaseTimeEntity{
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @OneToOne(fetch =  FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-    @JoinColumn(name = "attechmentId")
+    @OneToOne(fetch =  FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @JoinColumn(name = "attachment_id")
     private Attachment attachment;
 }

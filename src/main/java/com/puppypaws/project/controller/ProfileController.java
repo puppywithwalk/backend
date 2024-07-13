@@ -7,6 +7,7 @@ import com.puppypaws.project.repository.MemberRepository;
 import com.puppypaws.project.service.AwsS3UploadService;
 import com.puppypaws.project.service.ProfileService;
 import com.puppypaws.project.util.SecurityUtil;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,28 +18,15 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 public class ProfileController {
     private final AwsS3UploadService awsS3UploadService;
     private final MemberRepository memberRepository;
     private final ProfileService profileService;
-
     private static final Logger logger = (Logger) LoggerFactory.getLogger(ProfileController.class);
-
-    @Autowired
-    public ProfileController(
-            AwsS3UploadService awsS3UploadService,
-            MemberRepository memberRepository,
-            ProfileService profileService) {
-        this.awsS3UploadService = awsS3UploadService;
-        this.memberRepository = memberRepository;
-        this.profileService = profileService;
-    }
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponseDto> getProfile() {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
 
         return profileService.getProfile(SecurityUtil.getAuthenticatedUserId());
     }
@@ -47,10 +35,6 @@ public class ProfileController {
     public ResponseEntity<String> updateProfile(
             @RequestPart(value = "profile_image", required = false) MultipartFile image,
             @RequestPart(value = "nickname", required = false) String nickname) {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            return ResponseEntity.status(400).body("UserId is null");
-        }
-
         Optional<Member> memberOpt = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
         Member member = memberOpt.get();
 
@@ -81,10 +65,6 @@ public class ProfileController {
             @RequestPart(value = "dog_character2", required = false) String dog_character2,
             @RequestPart(value = "dog_type", required = false) String dog_type,
             @RequestPart(value = "dog_name", required = false) String dog_name) {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            return ResponseEntity.status(400).body("UserId is null");
-        }
-
         Optional<Member> memberOpt = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
         Member member = memberOpt.get();
         logger.info(member.toString());
@@ -119,10 +99,6 @@ public class ProfileController {
     @DeleteMapping("/dog-profile")
     @ResponseBody
     public ResponseEntity<String> deleteDogProfile() {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            return ResponseEntity.status(400).body("UserId is null");
-        }
-
         Optional<Member> memberOpt = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
         Member member = memberOpt.get();
 

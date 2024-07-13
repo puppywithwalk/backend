@@ -5,18 +5,20 @@ import com.puppypaws.project.dto.Dogstagram.DogstagramResponseDto;
 import com.puppypaws.project.entity.Attachment;
 import com.puppypaws.project.entity.Dogstagram;
 import com.puppypaws.project.entity.Member;
+import com.puppypaws.project.exception.CustomException;
+import com.puppypaws.project.exception.ErrorCode;
 import com.puppypaws.project.model.IDogstagram;
 import com.puppypaws.project.repository.AttachmentRepository;
 import com.puppypaws.project.repository.DogstagramRepository;
 import com.puppypaws.project.repository.MemberRepository;
 import com.puppypaws.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DogstagramService {
     private final MemberRepository memberRepository;
     private final DogstagramRepository dogstagramRepository;
@@ -65,18 +68,15 @@ public class DogstagramService {
         return dogstagramRepository.findById(id);
     }
 
+    @Transactional
     public ResponseEntity<String> postDogstagram(
             MultipartFile image,
             MultipartFile image2,
             MultipartFile image3,
-            String description) throws IOException {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            return ResponseEntity.status(400).body("UserId is null");
-        }
-
+            String description) {
         Optional<Member> member = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
         if (member.isEmpty()) {
-            return ResponseEntity.status(400).body("no user");
+            throw new CustomException(ErrorCode.NO_USER);
         }
 
         try{
@@ -98,7 +98,6 @@ public class DogstagramService {
                     String url3 = awsS3UploadService.saveFile(image3, "dogstagram");
                     attachment.setUrl3(url3);
                 }
-                attachment.setDogstagram(dogstagram);
                 dogstagram.setAttachment(attachment);
 
                 dogstagramRepository.save(dogstagram);
@@ -109,49 +108,37 @@ public class DogstagramService {
         }
     }
 
+    @Transactional
     public ResponseEntity<String> patchDogstagram(
             Long id,
-            String description) throws IOException {
-        try{
-            Dogstagram dogstagram = this.validateUserOwnership(id);
+            String description) {
+        Dogstagram dogstagram = this.validateUserOwnership(id);
+        dogstagram.setDescription(description);
 
-            dogstagram.setDescription(description);
-
-            dogstagramRepository.save(dogstagram);
-            return ResponseEntity.ok("fin");
-        } catch(IOException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok("fin");
     }
 
-    public ResponseEntity<String> deleteDogstagram(Long id) throws BadRequestException {
-        try {
-            Dogstagram dogstagram = this.validateUserOwnership(id);
+    @Transactional
+    public ResponseEntity<String> deleteDogstagram(Long id) {
+        Dogstagram dogstagram = this.validateUserOwnership(id);
 
-            dogstagramRepository.delete(dogstagram);
+        dogstagramRepository.delete(dogstagram);
 
-            return ResponseEntity.ok("fin");
-        } catch (BadRequestException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok("fin");
     }
 
-    private Dogstagram validateUserOwnership(Long id) throws BadRequestException {
-        if (SecurityUtil.getAuthenticatedUserId() == null) {
-            throw new BadRequestException("UserId is null");
-        }
-
+    private Dogstagram validateUserOwnership(Long id) {
         Optional<Dogstagram> dogstagram = dogstagramRepository.findById(id);
 
         if(dogstagram.isEmpty()) {
-            throw new BadRequestException("dogstagram Id를 확인해주세요");
+            throw new CustomException(ErrorCode.NOT_FOUND);
         }
 
         Dogstagram dogstagramEntity = dogstagram.get();
         Long dogstagramMemberId = dogstagramEntity.getMember().getId();
 
         if(!Objects.equals(SecurityUtil.getAuthenticatedUserId(), dogstagramMemberId)){
-            throw new BadRequestException("작성자가 아닙니다. " + SecurityUtil.getAuthenticatedUserId().toString() + " " + dogstagramMemberId.toString());
+            throw new CustomException(ErrorCode.NOT_AUTHOR);
         }
 
         return dogstagramEntity;

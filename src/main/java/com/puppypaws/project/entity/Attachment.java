@@ -38,7 +38,6 @@ public class Attachment extends BaseTimeEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "dogstagram_id")
+    @OneToOne(mappedBy = "attachment", fetch = FetchType.LAZY)
     private Dogstagram dogstagram;
 }

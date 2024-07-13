@@ -34,7 +34,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "                where dogstagram_like.user_id = :id" +
             "            ) AS is_liked, dogstagram.created_at AS created_at " +
             "FROM dogstagram dogstagram " +
-            "INNER JOIN attachment attachment ON dogstagram.id = attachment.dogstagram_id " +
+            "INNER JOIN attachment attachment ON dogstagram.attachment_id = attachment.id " +
             "INNER JOIN member member ON member.id = dogstagram.member_id " +
             "LEFT JOIN (SELECT (select nickname from member where id = :id) as nickname," +
             "               dogstagram_id" +
@@ -63,7 +63,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
                     "                where dogstagram_like.user_id = :id" +
                     "            ) AS is_liked, dogstagram.created_at AS created_at " +
                     "FROM dogstagram dogstagram " +
-                    "INNER JOIN attachment attachment ON dogstagram.id = attachment.dogstagram_id " +
+                    "INNER JOIN attachment attachment ON dogstagram.attachment_id = attachment.id " +
                     "INNER JOIN member member ON member.id = dogstagram.member_id " +
                     "LEFT JOIN (SELECT (select nickname from member where id = :id) as nickname," +
                     "               dogstagram_id" +
@@ -101,7 +101,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "FROM" +
             "    dogstagram" +
             "        INNER JOIN member ON member.id = dogstagram.member_id" +
-            "        INNER JOIN attachment ON dogstagram.id = attachment.dogstagram_id" +
+            "        INNER JOIN attachment ON dogstagram.attachment_id = attachment.id" +
             " WHERE dog_type ~* :search_word " +
             "ORDER BY" +
             "    dogstagram.created_at DESC " +
