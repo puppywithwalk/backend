@@ -39,7 +39,7 @@ public class DogstagramService {
     private static final Logger logger = LoggerFactory.getLogger(DogstagramService.class);
 
     public List<DogstagramResponseDto> getList(int take, int skip) {
-        Long id = null;
+        Long id = SecurityUtil.getAuthenticatedUserId();
         List<IDogstagram> dogstagrams = dogstagramRepository.getDogstagramList(id, take, skip);
 
         return dogstagrams.stream()
@@ -48,7 +48,7 @@ public class DogstagramService {
     }
 
     public List<DogstagramResponseDto> getStarDogList() {
-        Long id = null;
+        Long id = SecurityUtil.getAuthenticatedUserId();
         List<IDogstagram> dogstagrams = dogstagramRepository.getStarDogstagramList(id);
 
         // Map IDogstagram entities to DogstagramResponseDto using ModelMapper
