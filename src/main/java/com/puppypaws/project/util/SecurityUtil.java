@@ -14,7 +14,7 @@ public class SecurityUtil {
         return Optional.ofNullable(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_USER));
     }
-     static Long getAuthenticatedUserIdFromContext() {
+     public static Long getAuthenticatedUserIdFromContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
