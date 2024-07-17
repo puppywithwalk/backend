@@ -4,11 +4,13 @@ import com.puppypaws.project.dto.Dogstagram.DogstagramRequestDto;
 import com.puppypaws.project.dto.Dogstagram.DogstagramResponseDto;
 import com.puppypaws.project.entity.Attachment;
 import com.puppypaws.project.entity.Dogstagram;
+import com.puppypaws.project.entity.DogstagramLike;
 import com.puppypaws.project.entity.Member;
 import com.puppypaws.project.exception.CustomException;
 import com.puppypaws.project.exception.ErrorCode;
 import com.puppypaws.project.model.IDogstagram;
 import com.puppypaws.project.repository.AttachmentRepository;
+import com.puppypaws.project.repository.DogstagramLikeRepository;
 import com.puppypaws.project.repository.DogstagramRepository;
 import com.puppypaws.project.repository.MemberRepository;
 import com.puppypaws.project.util.SecurityUtil;
@@ -33,13 +35,13 @@ import java.util.stream.Collectors;
 public class DogstagramService {
     private final MemberRepository memberRepository;
     private final DogstagramRepository dogstagramRepository;
-    private final AttachmentRepository attachmentRepository;
+    private final DogstagramLikeRepository dogstagramLikeRepository;
     private final AwsS3UploadService awsS3UploadService;
     private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(DogstagramService.class);
 
     public List<DogstagramResponseDto> getList(int take, int skip) {
-        Long id = SecurityUtil.getAuthenticatedUserId();
+        Long id = SecurityUtil.getAuthenticatedUserIdFromContext();
         List<IDogstagram> dogstagrams = dogstagramRepository.getDogstagramList(id, take, skip);
 
         return dogstagrams.stream()
@@ -48,7 +50,7 @@ public class DogstagramService {
     }
 
     public List<DogstagramResponseDto> getStarDogList() {
-        Long id = SecurityUtil.getAuthenticatedUserId();
+        Long id = SecurityUtil.getAuthenticatedUserIdFromContext();
         List<IDogstagram> dogstagrams = dogstagramRepository.getStarDogstagramList(id);
 
         // Map IDogstagram entities to DogstagramResponseDto using ModelMapper
@@ -58,7 +60,8 @@ public class DogstagramService {
     }
 
     public List<DogstagramResponseDto> searchDogstagrams(String searchWord, int take, int skip) {
-        List<IDogstagram> dogstagrams = dogstagramRepository.searchDogstagramBy(SecurityUtil.getAuthenticatedUserId(), searchWord, take, skip);
+        Long id = SecurityUtil.getAuthenticatedUserIdFromContext();
+        List<IDogstagram> dogstagrams = dogstagramRepository.searchDogstagramBy(id, searchWord, take, skip);
         return dogstagrams.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -125,6 +128,30 @@ public class DogstagramService {
         dogstagramRepository.delete(dogstagram);
 
         return ResponseEntity.ok("fin");
+    }
+
+    @Transactional
+    public ResponseEntity<String> like(Long dogstaramId){
+        Long id = SecurityUtil.getAuthenticatedUserId();
+
+        Optional<Dogstagram> dogstagram = dogstagramRepository.findById(dogstaramId);
+        if(dogstagram.isEmpty()){
+            return ResponseEntity.badRequest().body("dogstagram 확인해주세요.");
+        }
+
+        Optional<DogstagramLike> dogstagramLike = dogstagramLikeRepository.findOneByDogstagramIdAndUserId(dogstagram.get().getId(), id);
+
+        if(dogstagramLike.isEmpty()) {
+            DogstagramLike newDogstagramLike = new DogstagramLike();
+            newDogstagramLike.setDogstagram(dogstagram.get());
+            newDogstagramLike.setUserId(id);
+
+            dogstagramLikeRepository.save(newDogstagramLike);
+        }else{
+            dogstagramLikeRepository.delete(dogstagramLike.get());
+        }
+
+        return ResponseEntity.ok("good");
     }
 
     private Dogstagram validateUserOwnership(Long id) {

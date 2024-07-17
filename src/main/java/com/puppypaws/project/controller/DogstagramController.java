@@ -62,6 +62,13 @@ public class DogstagramController {
         return dogstagramService.postDogstagram(image, image2, image3, description);
     }
 
+    @PostMapping("/dogstagram/like/{id}")
+    public ResponseEntity<String> like(
+            @PathVariable(value = "id") Long id
+    ){
+        return dogstagramService.like(id);
+    }
+
     @PatchMapping("/dogstagram/{id}")
     public ResponseEntity<String> patchDogstagram (
             @PathVariable(value = "id") Long id,

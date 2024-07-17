@@ -27,8 +27,14 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponseDto> getProfile() {
-
         return profileService.getProfile(SecurityUtil.getAuthenticatedUserId());
+    }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<ProfileResponseDto> getUserProfile(
+            @PathVariable(value = "id") Long id
+    ) {
+        return profileService.getProfile(id);
     }
 
     @PostMapping("/profile")

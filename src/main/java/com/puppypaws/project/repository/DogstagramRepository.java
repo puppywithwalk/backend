@@ -32,7 +32,8 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "EXISTS(select dogstagram_like.id" +
             "                from dogstagram_like" +
             "                where dogstagram_like.user_id = :id" +
-            "            ) AS is_liked, dogstagram.created_at AS created_at " +
+            "            ) AS is_liked," +
+            "dogstagram.created_at AS created_at " +
             "FROM dogstagram dogstagram " +
             "INNER JOIN attachment attachment ON dogstagram.attachment_id = attachment.id " +
             "INNER JOIN member member ON member.id = dogstagram.member_id " +
@@ -46,30 +47,55 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
     public List<IDogstagram> getDogstagramList(@Param(value = "id") Long id, @Param(value = "take") int take, @Param(value = "skip") int skip);
 
     @Query(value =
-            "SELECT dogstagram.id AS id," +
-                    "dogstagram.description AS description," +
-                    "attachment.url AS url," +
-                    "attachment.url2 AS url2," +
-                    "attachment.url3 AS url3," +
-                    "member.nickname AS nickname," +
-                    "member.id AS user_id," +
-                    "member.dog_type AS dog_type," +
-                    "member.profile_url AS profile_url," +
-                    "dogstagram_like.nickname AS last_liked_nickname," +
-                    "dogstagram.created_at AS created_at," +
-                    "(SELECT COUNT(m.id) AS total_like FROM dogstagram_like m WHERE m.dogstagram_id = dogstagram.id) AS total_like," +
-                    "EXISTS(select dogstagram_like.id" +
-                    "                from dogstagram_like" +
-                    "                where dogstagram_like.user_id = :id" +
-                    "            ) AS is_liked, dogstagram.created_at AS created_at " +
-                    "FROM dogstagram dogstagram " +
-                    "INNER JOIN attachment attachment ON dogstagram.attachment_id = attachment.id " +
-                    "INNER JOIN member member ON member.id = dogstagram.member_id " +
-                    "LEFT JOIN (SELECT (select nickname from member where id = :id) as nickname," +
-                    "               dogstagram_id" +
-                    "           FROM dogstagram_like dogstagram_like ORDER BY dogstagram_like.created_at DESC) dogstagram_like" +
-                    "           ON dogstagram_like.dogstagram_id = dogstagram.id " +
-                    "ORDER BY total_like DESC, created_at DESC " +
+            "SELECT " +
+                    "    d.id AS id," +
+                    "    d.description AS description," +
+                    "    a.url AS url," +
+                    "    a.url2 AS url2," +
+                    "    a.url3 AS url3," +
+                    "    m.nickname AS nickname," +
+                    "    m.id AS user_id," +
+                    "    m.dog_type AS dog_type," +
+                    "    m.profile_url AS profile_url," +
+                    "    COALESCE(last_like.nickname, '') AS last_liked_nickname," +
+                    "    d.created_at AS created_at," +
+                    "    COUNT(dl.id) AS total_like," +
+                    "    EXISTS (" +
+                    "        SELECT 1" +
+                    "        FROM dogstagram_like dl2" +
+                    "        WHERE dl2.dogstagram_id = d.id AND dl2.user_id = :id" +
+                    "    ) AS is_liked\n" +
+                    "FROM " +
+                    "    dogstagram d " +
+                    "INNER JOIN " +
+                    "    attachment a ON d.attachment_id = a.id " +
+                    "INNER JOIN " +
+                    "    member m ON d.member_id = m.id " +
+                    "LEFT JOIN ( " +
+                    "    SELECT " +
+                    "        dl.dogstagram_id," +
+                    "        m.nickname," +
+                    "        dl.created_at" +
+                    "    FROM ( " +
+                    "        SELECT " +
+                    "            dogstagram_id, " +
+                    "            MAX(created_at) AS max_created_at " +
+                    "        FROM " +
+                    "            dogstagram_like " +
+                    "        GROUP BY " +
+                    "            dogstagram_id" +
+                    "    ) latest " +
+                    "    INNER JOIN " +
+                    "        dogstagram_like dl ON latest.dogstagram_id = dl.dogstagram_id AND latest.max_created_at = dl.created_at " +
+                    "    INNER JOIN " +
+                    "        member m ON dl.user_id = m.id " +
+                    ") last_like ON d.id = last_like.dogstagram_id " +
+                    "LEFT JOIN " +
+                    "    dogstagram_like dl ON d.id = dl.dogstagram_id " +
+                    "GROUP BY " +
+                    "    d.id, d.description, a.url, a.url2, a.url3, m.nickname, m.id, m.dog_type, m.profile_url, last_like.nickname, d.created_at " +
+                    "ORDER BY " +
+                    "    total_like DESC, d.created_at DESC " +
                     "LIMIT 4 ", nativeQuery = true)
     public List<IDogstagram> getStarDogstagramList(@Param(value = "id") Long id);
     
