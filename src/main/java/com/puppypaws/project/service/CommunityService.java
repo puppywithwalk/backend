@@ -1,6 +1,7 @@
 package com.puppypaws.project.service;
 
 import com.puppypaws.project.dto.Community.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.CommunitySearchCondition;
 import com.puppypaws.project.dto.Community.PostCommunityRequestDto;
 import com.puppypaws.project.entity.Member;
 import com.puppypaws.project.exception.CustomException;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import com.puppypaws.project.entity.Community;
 import com.puppypaws.project.repository.CommunityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -48,10 +50,11 @@ public class CommunityService {
         }
     }
 
-    public List<CommunityResponseDto> getCommunitiesByConditions(int pageNo, int pageSize, String pickupLocation, String status, String dogType) {
+    public List<CommunityResponseDto> getCommunitiesByConditions(CommunitySearchCondition communitySearchCondition, int pageNo, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
-        Page<Community> result = communityRepository.findCommunitiesByConditions(pickupLocation, status, dogType, pageRequest);
-        return result.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
+        Slice<CommunityResponseDto> result = communityRepository.findCommunitiesByConditions(communitySearchCondition, pageRequest);
+
+        return result.getContent();
     }
 
     @Transactional

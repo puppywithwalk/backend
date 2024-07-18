@@ -1,11 +1,15 @@
 package com.puppypaws.project.dto.Community;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
-@Setter
+@Data
+@NoArgsConstructor
 public class CommunityResponseDto {
     @JsonProperty("id")
     private Long id;
@@ -44,5 +48,22 @@ public class CommunityResponseDto {
     private String profileUrl;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
+
+
+    public CommunityResponseDto(Long id, String pickupLocation, Date pickupDate, String status, String dogName, String dogProfileUrl, String dogType, String dogCharacter, String description, String nickname, Long userId, String profileUrl, LocalDateTime createdAt) {
+        this.id = id;
+        this.pickupLocation = pickupLocation;
+        this.pickupDate = pickupDate;
+        this.status = status;
+        this.dogName = dogName;
+        this.dogProfileUrl = dogProfileUrl;
+        this.dogType = dogType;
+        this.dogCharacter = dogCharacter;
+        this.description = description;
+        this.nickname = nickname;
+        this.userId = userId;
+        this.profileUrl = profileUrl;
+        this.createdAt = createdAt;
+    }
 }

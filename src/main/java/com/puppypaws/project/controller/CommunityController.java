@@ -1,9 +1,9 @@
 package com.puppypaws.project.controller;
 
 import com.puppypaws.project.dto.Community.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.CommunitySearchCondition;
 import com.puppypaws.project.dto.Community.PostCommunityRequestDto;
 import com.puppypaws.project.service.CommunityService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,15 +35,12 @@ public class CommunityController {
     ) {
         return communityService.getOne(id);
     }
-
     @GetMapping("/community/search")
     public List<CommunityResponseDto> searchCommunityList(
-            @RequestParam String pickupLocation,
-            @RequestParam String status,
-            @RequestParam String dogType,
+            CommunitySearchCondition communitySearchCondition,
             @RequestParam(name = "skip", defaultValue = "0") int pageNo,
             @RequestParam(name = "take", defaultValue = "10") int pageSize) {
-        return communityService.getCommunitiesByConditions(pageNo, pageSize, pickupLocation, status, dogType);
+        return communityService.getCommunitiesByConditions(communitySearchCondition, pageNo, pageSize);
     }
 
     @PostMapping("/community")

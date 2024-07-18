@@ -1,9 +1,10 @@
 package com.puppypaws.project.repository;
 
-import com.puppypaws.project.entity.Community;
-import org.springframework.data.domain.Page;
+import com.puppypaws.project.dto.Community.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.CommunitySearchCondition;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface CommunityRepositoryCustom {
-    Page<Community> findCommunitiesByConditions(String pickupLocation, String status, String dogType, Pageable pageable);
+    Slice<CommunityResponseDto> findCommunitiesByConditions(CommunitySearchCondition communitySearchCondition, Pageable pageable);
 }

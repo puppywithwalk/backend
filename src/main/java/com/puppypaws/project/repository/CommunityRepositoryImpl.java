@@ -1,13 +1,12 @@
 package com.puppypaws.project.repository;
 
-import com.puppypaws.project.entity.Community;
+import com.puppypaws.project.dto.Community.CommunityResponseDto;
+import com.puppypaws.project.dto.Community.CommunitySearchCondition;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -21,30 +20,50 @@ import static com.puppypaws.project.entity.QMember.member;
 public class CommunityRepositoryImpl implements CommunityRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    @Override
-    public Page<Community> findCommunitiesByConditions(String pickupLocation, String status, String dogType, Pageable pageable) {
-        JPAQuery<Community> query = queryFactory
-                .selectFrom(community)
-                .innerJoin(community.member, member).fetchJoin()
+    public Slice<CommunityResponseDto> findCommunitiesByConditions(CommunitySearchCondition condition, Pageable pageable) {
+        List<CommunityResponseDto> contents = queryFactory
+                .select(Projections.constructor(CommunityResponseDto.class,
+                        community.id,
+                        community.pickupLocation,
+                        community.pickupDate,
+                        community.status,
+                        member.dogName,
+                        member.dogProfileUrl,
+                        member.dogType,
+                        member.dogCharacter,
+                        community.description,
+                        member.nickname,
+                        member.id.as("userId"),
+                        member.profileUrl,
+                        community.createdAt)
+                )
+                .from(community)
+                .innerJoin(community.member, member)
                 .where(
-                        eqPickupLocation(pickupLocation),
-                        eqStatus(status),
-                        likeDogType(dogType)
-                );
-
-        long totalCount = query.fetchCount();
-
-        List<Community> results = query
+                        eqPickupLocation(condition.getPickupLocation()),
+                        eqStatus(condition.getStatus()),
+                        likeDogType(condition.getDogType())
+                )
+                .orderBy(community.createdAt.desc())
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        return new PageImpl<>(results, pageable, totalCount);
+
+        return new SliceImpl<>(contents, pageable, hasNextPage(contents, pageable.getPageSize()));
+    }
+
+    private boolean hasNextPage(List<CommunityResponseDto> contents, int pageSize) {
+        if (contents.size() > pageSize) {
+            contents.remove(pageSize);
+            return true;
+        }
+        return false;
     }
 
     private BooleanExpression eqPickupLocation(String pickupLocation) {
         return StringUtils.hasText(pickupLocation)
-                ? community.pickupLocation.like("%" + pickupLocation + "%")
+                ? community.pickupLocation.contains(pickupLocation)
                 : null;
     }
 
@@ -56,7 +75,7 @@ public class CommunityRepositoryImpl implements CommunityRepositoryCustom {
 
     private BooleanExpression likeDogType(String dogType) {
         return StringUtils.hasText(dogType)
-                ? member.dogType.like("%" + dogType + "%")
+                ? member.dogType.contains(dogType)
                 : null;
     }
 }
