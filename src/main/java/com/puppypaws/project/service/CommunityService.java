@@ -13,6 +13,7 @@ import com.puppypaws.project.entity.Community;
 import com.puppypaws.project.repository.CommunityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class CommunityService {
     private final ModelMapper modelMapper;
 
     public List<CommunityResponseDto> getList(int pageNo, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNo, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Community> result = communityRepository.findAll(pageRequest);
         return result.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
     }
