@@ -26,26 +26,28 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "member.id AS user_id," +
             "member.dog_type AS dog_type," +
             "member.profile_url AS profile_url," +
-            "dogstagram_like.nickname AS last_liked_nickname," +
+            "(SELECT nickname     FROM member     " +
+                    "WHERE id = (SELECT user_id " +
+            "                   FROM dogstagram_like " +
+            "                    WHERE dogstagram_id = dogstagram.id " +
+            "                   ORDER BY created_at DESC  LIMIT 1)" +
+            ") AS last_liked_nickname," +
             "dogstagram.created_at AS created_at," +
             "(SELECT COUNT(m.id) AS total_like FROM dogstagram_like m WHERE m.dogstagram_id = dogstagram.id) AS total_like," +
-            "EXISTS(select dogstagram_like.id" +
-            "                from dogstagram_like" +
-            "                where dogstagram_like.user_id = :id" +
-            "            ) AS is_liked," +
+            "CASE  WHEN EXISTS (SELECT 1 " +
+            "                   FROM dogstagram_like dl " +
+            "                          WHERE dl.dogstagram_id = dogstagram.id AND dl.user_id = :id           " +
+            "                    ) THEN TRUE              " +
+            "               ELSE FALSE" +
+            "           END AS is_liked," +
             "dogstagram.created_at AS created_at " +
             "FROM dogstagram dogstagram " +
             "INNER JOIN attachment attachment ON dogstagram.attachment_id = attachment.id " +
             "INNER JOIN member member ON member.id = dogstagram.member_id " +
-            "LEFT JOIN (SELECT (select nickname from member where id = :id) as nickname," +
-            "               dogstagram_id" +
-            "           FROM dogstagram_like dogstagram_like ORDER BY dogstagram_like.created_at DESC) dogstagram_like" +
-            "           ON dogstagram_like.dogstagram_id = dogstagram.id " +
             "ORDER BY dogstagram.created_at DESC " +
             "LIMIT :take " +
             "OFFSET :skip", nativeQuery = true)
     public List<IDogstagram> getDogstagramList(@Param(value = "id") Long id, @Param(value = "take") int take, @Param(value = "skip") int skip);
-
     @Query(value =
             "SELECT " +
                     "    d.id AS id," +
@@ -98,7 +100,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
                     "    total_like DESC, d.created_at DESC " +
                     "LIMIT 4 ", nativeQuery = true)
     public List<IDogstagram> getStarDogstagramList(@Param(value = "id") Long id);
-    
+
     @Query(value =
     "SELECT" +
             "    dogstagram.id AS id," +
@@ -121,10 +123,13 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "    (SELECT COUNT(*)" +
             "     FROM dogstagram_like m" +
             "     WHERE m.dogstagram_id = dogstagram.id) AS total_like," +
-            "    EXISTS(SELECT 1" +
-            "           FROM dogstagram_like" +
-            "           WHERE dogstagram_id = dogstagram.id AND user_id = :user_id) AS is_liked " +
-            "FROM" +
+            "   CASE  WHEN EXISTS (SELECT 1" +
+            "                     FROM dogstagram_like dl" +
+            "                     WHERE dl.dogstagram_id = dogstagram.id AND dl.user_id = :user_id" +
+            "                 ) THEN TRUE" +
+            "                 ELSE FALSE" +
+            "                 END AS is_liked " +
+            " FROM" +
             "    dogstagram" +
             "        INNER JOIN member ON member.id = dogstagram.member_id" +
             "        INNER JOIN attachment ON dogstagram.attachment_id = attachment.id" +
