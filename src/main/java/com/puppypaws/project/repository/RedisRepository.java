@@ -25,8 +25,7 @@ public class RedisRepository {
         Long expire = redisTemplate.getExpire(oldKey, TimeUnit.MILLISECONDS);
         if (expire != null && expire > 0) {
             redisTemplate.opsForValue().set(key, value, expire, TimeUnit.MILLISECONDS);
-        } else {
-            redisTemplate.opsForValue().set(key, value);
+            redisTemplate.delete(oldKey);
         }
     }
 }
