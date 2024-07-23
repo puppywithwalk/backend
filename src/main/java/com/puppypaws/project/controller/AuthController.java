@@ -1,37 +1,37 @@
 package com.puppypaws.project.controller;
 
 import com.puppypaws.project.dto.Token.TokenResponseDto;
-import com.puppypaws.project.entity.Token;
-import com.puppypaws.project.repository.TokenRepository;
+import com.puppypaws.project.service.RedisService;
 import com.puppypaws.project.service.TokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
     private final TokenProvider tokenProvider;
-    private final TokenRepository tokenRepository;
+    private final RedisService redisService;
 
     @GetMapping("/signin/getToken")
-    public String test(){
+    public String test() {
         return "ok";
     }
 
     @GetMapping("/token/refresh")
     @ResponseBody
-    public ResponseEntity<TokenResponseDto> refresh(@RequestHeader("Authorization") final String accessToken){
-        String resolveToken = tokenProvider.resolveToken(accessToken);
-        Optional<Token> refreshToken = tokenRepository.findByAccessToken(resolveToken);
+    public ResponseEntity<TokenResponseDto> refresh(HttpServletRequest httpServletRequest) {
+        String resolveToken = tokenProvider.resolveToken(httpServletRequest);
+        String refreshToken = redisService.findTokenByRefreshToken(resolveToken);
 
-        if (refreshToken.isPresent() && tokenProvider.validationToken(refreshToken.get().getRefreshToken())) {
-             String newAccessToken = tokenProvider.reissueAccessToken(resolveToken);
+        if (StringUtils.hasText(refreshToken) && tokenProvider.validationToken(refreshToken)){
+            String newAccessToken = tokenProvider.reissueAccessToken(resolveToken, refreshToken);
             return ResponseEntity.ok(TokenResponseDto.of(200, newAccessToken));
+        } else{
+            return ResponseEntity.badRequest().body(TokenResponseDto.of(400, null));
         }
-
-        return ResponseEntity.badRequest().body(TokenResponseDto.of(400, null));
     }
 }
