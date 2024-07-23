@@ -1,6 +1,7 @@
 package com.puppypaws.project.service;
 
-import io.jsonwebtoken.JwtException;
+import com.puppypaws.project.exception.ErrorCode;
+import com.puppypaws.project.exception.auth.JwtTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (!tokenProvider.validationToken(token)) {
-            throw new JwtException("토큰 만료");
+            throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
 
         setAuthentication(token);

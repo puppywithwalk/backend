@@ -1,15 +1,13 @@
 package com.puppypaws.project.service;
 
-import com.puppypaws.project.dto.Dogstagram.DogstagramRequestDto;
 import com.puppypaws.project.dto.Dogstagram.DogstagramResponseDto;
 import com.puppypaws.project.entity.Attachment;
 import com.puppypaws.project.entity.Dogstagram;
 import com.puppypaws.project.entity.DogstagramLike;
 import com.puppypaws.project.entity.Member;
-import com.puppypaws.project.exception.CustomException;
 import com.puppypaws.project.exception.ErrorCode;
+import com.puppypaws.project.exception.common.NotFoundException;
 import com.puppypaws.project.model.IDogstagram;
-import com.puppypaws.project.repository.AttachmentRepository;
 import com.puppypaws.project.repository.DogstagramLikeRepository;
 import com.puppypaws.project.repository.DogstagramRepository;
 import com.puppypaws.project.repository.MemberRepository;
@@ -79,7 +77,7 @@ public class DogstagramService {
             String description) {
         Optional<Member> member = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
         if (member.isEmpty()) {
-            throw new CustomException(ErrorCode.NO_USER);
+            throw new NotFoundException(ErrorCode.NO_USER);
         }
 
         try{
@@ -158,14 +156,14 @@ public class DogstagramService {
         Optional<Dogstagram> dogstagram = dogstagramRepository.findById(id);
 
         if(dogstagram.isEmpty()) {
-            throw new CustomException(ErrorCode.NOT_FOUND);
+            throw new NotFoundException(ErrorCode.NOT_FOUND);
         }
 
         Dogstagram dogstagramEntity = dogstagram.get();
         Long dogstagramMemberId = dogstagramEntity.getMember().getId();
 
         if(!Objects.equals(SecurityUtil.getAuthenticatedUserId(), dogstagramMemberId)){
-            throw new CustomException(ErrorCode.NOT_AUTHOR);
+            throw new NotFoundException(ErrorCode.NOT_AUTHOR);
         }
 
         return dogstagramEntity;

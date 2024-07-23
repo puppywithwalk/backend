@@ -2,7 +2,7 @@ package com.puppypaws.project.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.puppypaws.project.dto.Token.TokenResponseDto;
-import io.jsonwebtoken.JwtException;
+import com.puppypaws.project.exception.auth.JwtTokenException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,7 +26,7 @@ public class TokenException extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (JwtException e) {
+        } catch (JwtTokenException e) {
             response.setStatus(401);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");

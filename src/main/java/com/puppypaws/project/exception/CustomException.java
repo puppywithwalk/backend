@@ -3,7 +3,7 @@ package com.puppypaws.project.exception;
 import lombok.Getter;
 
 @Getter
-public class CustomException extends RuntimeException {
+public abstract class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 

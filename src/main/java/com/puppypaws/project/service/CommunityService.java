@@ -4,8 +4,8 @@ import com.puppypaws.project.dto.Community.CommunityResponseDto;
 import com.puppypaws.project.dto.Community.CommunitySearchCondition;
 import com.puppypaws.project.dto.Community.PostCommunityRequestDto;
 import com.puppypaws.project.entity.Member;
-import com.puppypaws.project.exception.CustomException;
 import com.puppypaws.project.exception.ErrorCode;
+import com.puppypaws.project.exception.common.NotFoundException;
 import com.puppypaws.project.repository.MemberRepository;
 import com.puppypaws.project.util.SecurityUtil;
 import org.modelmapper.ModelMapper;
@@ -64,7 +64,7 @@ public class CommunityService {
 
         Optional<Member> memberOptional = memberRepository.findById(authenticatedUserId);
         if (memberOptional .isEmpty()) {
-           throw new CustomException(ErrorCode.NOT_AUTHOR);
+           throw new NotFoundException(ErrorCode.NOT_AUTHOR);
         }
 
         Member member  = memberOptional.get();
@@ -124,14 +124,14 @@ public class CommunityService {
         Optional<Community> community = communityRepository.findById(id);
 
         if (community.isEmpty()) {
-           throw new CustomException(ErrorCode.NOT_FOUND);
+           throw new NotFoundException(ErrorCode.NOT_FOUND);
         }
 
         Community communityEntity = community.get();
         Long communityMemberId = communityEntity.getMember().getId();
 
         if (!Objects.equals(SecurityUtil.getAuthenticatedUserId(), communityMemberId)) {
-            throw new CustomException(ErrorCode.NOT_AUTHOR);
+            throw new  NotFoundException(ErrorCode.NOT_AUTHOR);
         }
 
         return communityEntity;

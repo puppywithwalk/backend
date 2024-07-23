@@ -1,25 +1,22 @@
 package com.puppypaws.project.service;
 
 import com.puppypaws.project.entity.Member;
+import com.puppypaws.project.exception.ErrorCode;
+import com.puppypaws.project.exception.common.NotFoundException;
 import com.puppypaws.project.model.CustomOAuth2User;
 import com.puppypaws.project.model.GoogleUser;
 import com.puppypaws.project.model.KaKaoUser;
 import com.puppypaws.project.model.ProviderUser;
 import com.puppypaws.project.repository.MemberRepository;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -47,7 +44,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         } else if(registrationId.equals("kakao")){
             return new KaKaoUser(oAuth2User, clientRegistration);
         }
-        throw new RuntimeException("ILLEGAL_REGISTRATION_ID");
+        throw new NotFoundException(ErrorCode.ILLEGAL_REGISTRATION_ID);
     }
 
     private Long register(ProviderUser providerUser) {
