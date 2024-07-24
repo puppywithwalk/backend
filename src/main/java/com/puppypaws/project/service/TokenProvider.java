@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
-    private final static long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60L * 60L * 5L;
-    private final static long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60L * 60L * 30L;
+    private final static long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60L * 5L;
+    private final static long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60L * 30L;
     private final RedisService redisService;
     @Value("${jwt.secret}")
     private String secretKey;
@@ -60,33 +60,15 @@ public class TokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        Object principal = authentication.getPrincipal();
+        CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
 
-        // log
-        log.info("Principal class: {}", principal.getClass().getName());
-        log.info("Principal value: {}", principal.toString());
-
-        if (principal instanceof CustomOAuth2User customOAuth2User) {
-            return Jwts.builder()
-                    .claim("auth", authorities)
-                    .claim("id", customOAuth2User.getId())
-                    .setIssuedAt(now)
-                    .setExpiration(expiredDate)
-                    .signWith(key)
-                    .compact();
-        } else if (principal instanceof Integer id) {
-            return Jwts.builder()
-                    .claim("auth", authorities)
-                    .claim("id", id)
-                    .setIssuedAt(now)
-                    .setExpiration(expiredDate)
-                    .signWith(key)
-                    .compact();
-        } else {
-            String principalClass = principal != null ? principal.getClass().getName() : "null";
-            log.error("Principal is not an instance of CustomOAuth2User: {}", principalClass);
-            throw new IllegalArgumentException("Principal is not an instance of CustomOAuth2User: " + principalClass);
-        }
+        return Jwts.builder()
+                .setSubject(String.valueOf(principal.getId()))
+                .claim("role", authorities)
+                .setIssuedAt(now)
+                .setExpiration(expiredDate)
+                .signWith(key)
+                .compact();
     }
 
     public String reissueAccessToken(String oldAccessToken, String refreshToken) {
@@ -95,7 +77,7 @@ public class TokenProvider {
                 redisService.updateReissueAccessToken(reissueAccessToken, refreshToken, oldAccessToken);
                 return reissueAccessToken;
         }
-        throw new JwtTokenException(ErrorCode.EXPIRED_TOKEN);
+        throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
     }
 
     private Claims parseClaims(String accessToken) {
@@ -109,20 +91,21 @@ public class TokenProvider {
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get("auth") == null) {
+        if (claims.get("role") == null) {
             throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
 
-        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("role").toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        return new UsernamePasswordAuthenticationToken(claims.get("id"), "", authorities);
+        CustomOAuth2User principal = new CustomOAuth2User(Long.valueOf(claims.getSubject()));
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return "";

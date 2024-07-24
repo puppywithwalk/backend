@@ -3,10 +3,7 @@ package com.puppypaws.project.service;
 import com.puppypaws.project.entity.Member;
 import com.puppypaws.project.exception.ErrorCode;
 import com.puppypaws.project.exception.common.NotFoundException;
-import com.puppypaws.project.model.CustomOAuth2User;
-import com.puppypaws.project.model.GoogleUser;
-import com.puppypaws.project.model.KaKaoUser;
-import com.puppypaws.project.model.ProviderUser;
+import com.puppypaws.project.model.*;
 import com.puppypaws.project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -29,15 +26,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
 
         ClientRegistration clientRegistration = userRequest.getClientRegistration();
-        ProviderUser providerUser = providerUser(clientRegistration, oAuth2User);
+        OAuth2ProviderUser user = providerUser(clientRegistration, oAuth2User);
         String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
-        Long id = register(providerUser);
-
-        return new CustomOAuth2User(oAuth2User.getAuthorities(), oAuth2User.getAttributes(), userNameAttributeName, id);
+        Long id = register(user);
+        return new CustomOAuth2User(id, user, userNameAttributeName);
     }
 
-    private ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User){
+    private OAuth2ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User){
         String registrationId = clientRegistration.getRegistrationId();
         if(registrationId.equals("google")){
             return new GoogleUser(oAuth2User, clientRegistration);

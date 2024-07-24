@@ -7,13 +7,12 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public abstract class OAuth2ProviderUser implements ProviderUser{
-    private OAuth2User oAuth2User;
-    private ClientRegistration clientRegistration;
-    private Map<String, Object> getAttributes;
+    private final OAuth2User oAuth2User;
+    private final ClientRegistration clientRegistration;
+    private final Map<String, Object> getAttributes;
     public OAuth2ProviderUser(Map<String, Object> getAttributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
         this.getAttributes = getAttributes;
         this.oAuth2User = oAuth2User;
