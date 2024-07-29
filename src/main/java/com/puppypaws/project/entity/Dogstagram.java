@@ -2,11 +2,13 @@ package com.puppypaws.project.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "Dogstagram")
 public class Dogstagram extends BaseTimeEntity{
