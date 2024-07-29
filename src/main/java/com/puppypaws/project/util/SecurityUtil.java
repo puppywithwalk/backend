@@ -17,7 +17,8 @@ public class SecurityUtil {
     }
      public static Long getAuthenticatedUserIdFromContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"))) {
             CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
             return principal.getId();
         }
