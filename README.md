@@ -1,34 +1,38 @@
 # backend
 
-
 ## 기술 스택
 
 ### 개발
-
-- Java 17
-- Spring Boot
-- Spring Security
-- JPA (Java Persistence API)
-- OAuth 2.0
-- QueryDSL
-- JWT (JSON Web Token)
+<div>
+  <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white">
+  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+  <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=SpringSecurity&logoColor=white">
+  <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens">
+  <img src="https://img.shields.io/badge/JPA-007396?style=for-the-badge&logo=JPA&logoColor=white">
+  <img src="https://img.shields.io/badge/QueryDSL-0854C1?style=for-the-badge&logo=QueryDSL&logoColor=white">
+  <img src="https://img.shields.io/badge/OAuth 2.0-EC1C24?style=for-the-badge&logo=0auth&logoColor=white">
+</div>
 
 ### DB
-- Redis
-- PostgreSQL
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 ### DevOps
 
-- AWS EC2
-- AWS S3
+<div>
+  <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"> 
+  <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
+  <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
+</div>
 
 ### 프로젝트 관리
 
-- Jira
+![Jira](https://img.shields.io/badge/jira-%230A0FFF.svg?style=for-the-badge&logo=jira&logoColor=white)
+![Confluence](https://img.shields.io/badge/confluence-%23172BF4.svg?style=for-the-badge&logo=confluence&logoColor=white)
 
 ### 커뮤니티 및 소통
 
-- Discord
+![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)
 
 ## 전체 구성도
 ![image](https://github.com/user-attachments/assets/53d1023a-dbf4-439c-8e13-8b62f7f4abdc)
