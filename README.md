@@ -30,6 +30,9 @@
 
 - Discord
 
+## 전체 구성도
+![image](https://github.com/user-attachments/assets/53d1023a-dbf4-439c-8e13-8b62f7f4abdc)
+
 
 ## ERD
 ![image](https://github.com/user-attachments/assets/171359f3-f848-4c7b-afe3-94966e08b3af)
