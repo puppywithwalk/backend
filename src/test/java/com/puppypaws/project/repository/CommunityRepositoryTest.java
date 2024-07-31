@@ -6,6 +6,7 @@ import com.puppypaws.project.entity.Community;
 import com.puppypaws.project.entity.Member;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,7 @@ class CommunityRepositoryTest {
     @Autowired
     JPAQueryFactory queryFactory;
 
+    @BeforeEach
     public void setMemberAndCommunityData(){
         queryFactory = new JPAQueryFactory(em);
 
