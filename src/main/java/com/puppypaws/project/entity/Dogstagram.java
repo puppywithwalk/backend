@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Data
@@ -25,6 +28,9 @@ public class Dogstagram extends BaseTimeEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member member;
+
+    @OneToMany(mappedBy = "dogstagram" , cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DogstagramLike> dogstagramLikes = new ArrayList<>();
 
     @OneToOne(fetch =  FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
     @JoinColumn(name = "attachment_id")
