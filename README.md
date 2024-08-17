@@ -39,7 +39,8 @@
 
 
 ## ERD
-![image](https://github.com/user-attachments/assets/171359f3-f848-4c7b-afe3-94966e08b3af)
+![image](https://github.com/user-attachments/assets/83ea65a5-5767-43fa-b037-c9f4546f3df5)
+
 
 ## 설치 및 실행방법
 
