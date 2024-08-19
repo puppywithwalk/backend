@@ -25,8 +25,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setHeader(AUTHORIZATION, "bearer " + accessToken);
 
         String targetUrl = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost:3000")
+                .scheme("https")
+                .host("www.puppy-paws.co.kr")
                 .path("/signin/getToken")
                 .queryParam("accessToken", accessToken)
                 .build().toUriString();
