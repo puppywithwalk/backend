@@ -135,7 +135,7 @@ public interface DogstagramRepository extends JpaRepository<Dogstagram, Long> {
             "    dogstagram" +
             "        INNER JOIN member ON member.id = dogstagram.member_id" +
             "        INNER JOIN attachment ON dogstagram.attachment_id = attachment.id" +
-            " WHERE dog_type ~* :search_word " +
+            " WHERE description ~* :search_word " +
             "ORDER BY" +
             "    dogstagram.created_at DESC " +
             "LIMIT :take " +
