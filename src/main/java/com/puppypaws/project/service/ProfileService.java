@@ -10,11 +10,14 @@ import com.puppypaws.project.entity.Member;
 import com.puppypaws.project.repository.CommunityRepository;
 import com.puppypaws.project.repository.DogstagramRepository;
 import com.puppypaws.project.repository.MemberRepository;
+import com.puppypaws.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+    private final AwsS3UploadService awsS3UploadService;
     private final MemberRepository memberRepository;
     private final DogstagramRepository dogstagramRepository;
     private final CommunityRepository communityRepository;
@@ -44,6 +48,39 @@ public class ProfileService {
         return ResponseEntity.ok(dto);
     }
 
+    public ResponseEntity<String> uploadImage(String type, MultipartFile image) {
+        Optional<Member> memberOpt = memberRepository.findById(SecurityUtil.getAuthenticatedUserId());
+        if (memberOpt.isEmpty()) {
+            return ResponseEntity.status(400).body("Member not found");
+        }
+
+        Member member = memberOpt.get();
+
+        try {
+            updateProfileImage(type, image, member);
+            memberRepository.save(member);
+            return ResponseEntity.ok("fin");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Profile update failed: " + e.getMessage());
+        }
+    }
+
+
+    private void updateProfileImage(String type, MultipartFile image, Member member) throws IOException {
+        if (!type.equals("dog-profile") && !type.equals("profile")) {
+            throw new IllegalArgumentException("Invalid profile type: " + type);
+        }
+
+        String url = (image != null) ? awsS3UploadService.saveFile(image, type) : null;
+
+        if (type.equals("dog-profile")) {
+            member.setDogProfileUrl(url);
+        } else {
+            member.setProfileUrl(url);
+        }
+    }
     private ProfileMemberResponseDto convertToMemberDto(Optional<Member> member) {
         ProfileMemberResponseDto dto = modelMapper.map(member, ProfileMemberResponseDto.class);
 
